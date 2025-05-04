@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chen's Baby Shower Jeopardy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #1d1d1d;
+      color: #ffffff;
+    }
+
+    .card-content {
+      text-align: center;
+      cursor: pointer;
+      font-size: 1.5em;
+      padding: 10px;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      justify-items: center;
+      margin-top: 30px;
+    }
+
+    .category-column {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .card {
+      margin: 5px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card.used {
+      background-color: #888 !important;
+      pointer-events: none;
+    }
+
+    #game-board h4 {
+      margin-bottom: 30px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    #modal-answer {
+      font-size: 2.0em;
+      text-align: center;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+
+    #modal-question {
+      font-size: 1.8em;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .card.blue {
+      background-color: #0069b4;
+      color: white;
+    }
+
+    .card.yellow {
+      background-color: #ffcc00;
+      color: black;
+    }
+
+    #final-jeopardy-btn {
+      margin-top: 40px;
+      display: none;
+      width: 100%;
+      font-size: 2.0em;
+      background-color: #0069b4;
+      color: white;
+    }
+
+    #final-jeopardy-btn:hover {
+      background-color: #004a99;
+    }
+
+    #final-jeopardy-modal .modal-content h4 {
+      text-align: center;
+      font-size: 3em;
+      font-weight: 900;
+      color: #0069b4;
+    }
+
+    #final-jeopardy-modal .modal-content p {
+      font-size: 2em;
+      text-align: center;
+      font-weight: bold;
+      color: black; /* Text color for Final Jeopardy */
+    }
+
+    .center-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .start-game-btn {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    #welcome-modal .modal-content {
+      text-align: center;
+    }
+
+    #welcome-modal .modal-content p {
+      font-size: 2em;
+      color: black; /* Ensure text is black in welcome pop-up */
+    }
+
+    #welcome-modal .modal-content h4 {
+      color: black; /* Ensure "Welcome" text is black */
+      font-size: 2.5em;
+      font-weight: bold;
+    }
+
+    #correct-question {
+      text-align: center;
+      font-size: 1.6em;
+    }
+
+    #trigger-final-jeopardy {
+      display: none;
+    }
+
+    #question-modal .modal-content {
+      color: black; /* Set text color to black for better readability */
+    }
+
+    #question-modal .modal-content p {
+      color: black; /* Set text color to black for better visibility inside question pop-up */
+    }
+
+    #final-jeopardy-modal .modal-content p {
+      color: black; /* Set text color to black for Final Jeopardy question */
+    }
+  </style>
+</head>
+<body>
+
+  <div id="welcome-modal" class="modal">
+    <div class="modal-content">
+      <h4>Welcome to Chen's Baby Shower Jeopardy!</h4> <!-- Centered and black color -->
+      <p>Respond with an answer as a question, like: <strong>What is ...?</strong></p>
+      <p>Have fun!</p>
+    </div>
+    <div class="modal-footer start-game-btn">
+      <a href="#!" class="modal-close waves-effect waves-green btn">Start Game</a>
+    </div>
+  </div>
+
+  <div class="container" id="game-board">
+    <h4>Chen's Baby Shower Jeopardy Board</h4>
+    <div class="row" id="board"></div>
+    <button id="final-jeopardy-btn" class="btn-large waves-effect waves-light">Final Jeopardy</button>
+  </div>
+
+  <div id="question-modal" class="modal">
+    <div class="modal-content">
+      <h5 id="modal-category" class="center-align">Category</h5>
+      <p id="modal-answer">Answer goes here</p>
+      <div id="correct-question" class="hide">
+        <strong>Correct Answer:</strong>
+        <p id="modal-question" class="green-text"></p>
+      </div>
+    </div>
+    <div class="modal-footer center-btn">
+      <a href="#!" id="show-answer-btn" class="waves-effect waves-light btn">Show Answer</a>
+      <a href="#!" class="modal-close waves-effect btn-flat">Close</a>
+    </div>
+  </div>
+
+  <div id="final-jeopardy-modal" class="modal">
+    <div class="modal-content">
+      <h4>Final Jeopardy!</h4>
+      <p><strong>What year did Sailor Moon premiere on U.S. television?</strong></p>
+    </div>
+    <div class="modal-footer center-btn">
+      <a href="#!" class="modal-close waves-effect waves-light btn">Close</a>
+    </div>
+  </div>
+
+  <button id="trigger-final-jeopardy" onclick="markAllQuestionsAsUsed()">Invisible Trigger</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      M.Modal.init(document.querySelectorAll('.modal'));
+      M.Modal.getInstance(document.getElementById("welcome-modal")).open();
+      createBoard();
+    });
+
+    const categories = {
+      "Hello!": [
+        { answer: "Ni Hao!", question: "Chinese" },
+        { answer: "Xin Chao!", question: "Vietnamese" },
+        { answer: "Bonjour!", question: "French" },
+        { answer: "Kon'nichiwa!", question: "Japanese" },
+        { answer: "Sabaidee!", question: "Laotian" }
+      ],
+      "Moon": [
+        { answer: "The red planet.", question: "What is Mars?" },
+        { answer: "This planet has the most moons.", question: "What is Saturn?" },
+        { answer: "This object is at the center of our solar system.", question: "What is the Sun?" },
+        { answer: "Astronauts travel to space in this.", question: "What is a spaceship?" },
+        { answer: "This galaxy we live in.", question: "What is the Milky Way?" }
+      ],
+      "Moon": [
+        { answer: "The first man to walk on the Moon.", question: "Who is Neil Armstrong?" },
+        { answer: "The Moon affects these in the ocean.", question: "What are tides?" },
+        { answer: "The Moon is a natural ___ of Earth.", question: "What is satellite?" },
+        { answer: "We only see this side of the Moon from Earth.", question: "What is the near side?" },
+        { answer: "This mission first landed humans on the Moon.", question: "What is Apollo 11?" }
+      ],
+      "Long History": [
+        { answer: "He was the first president of the USA.", question: "Who is George Washington?" },
+        { answer: "They built the pyramids in Egypt.", question: "Who are the Ancient Egyptians?" },
+        { answer: "This was a famous wall in China.", question: "What is the Great Wall?" },
+        { answer: "This ship sank in 1912.", question: "What is the Titanic?" },
+        { answer: "He wrote the play 'Romeo and Juliet'.", question: "Who is William Shakespeare?" }
+      ],
+      "Memes": [
+        { answer: "This frog became famous for his sad face.", question: "Who is Pepe?" },
+        { answer: "A meme that starts with 'This is fine...' shows what?", question: "What is a dog in a burning room?" },
+        { answer: "This meme repeats the word 'Shrek' with remixed music.", question: "What is 'Shrek is love, Shrek is life'?" },
+        { answer: "He said 'I’m in me mum’s car, vroom vroom!'", question: "Who is a Vine kid?" },
+        { answer: "She’s smiling while a house is burning behind her.", question: "Who is Disaster Girl?" }
+      ],
+      "Babies": [
+        { answer: "Babies drink this from a bottle.", question: "What is milk?" },
+        { answer: "This is used to keep a baby clean after using the bathroom.", question: "What is a diaper?" },
+        { answer: "This soft toy helps babies sleep.", question: "What is a teddy bear?" },
+        { answer: "The sound a baby makes when happy.", question: "What is a giggle?" },
+        { answer: "Babies learn to do this before walking.", question: "What is crawling?" }
+      ]
+    };
+
+    let totalQuestions = 0;
+    let usedQuestions = 0;
+
+    function createBoard() {
+      const board = document.getElementById('board');
+      board.innerHTML = '';
+
+      Object.entries(categories).forEach(([category, questions]) => {
+        const col = document.createElement('div');
+        col.className = 'category-column';
+
+        const title = document.createElement('div');
+        title.className = 'card blue white-text center-align';
+        title.innerHTML = `<div class="card-content"><strong>${category}</strong></div>`;
+        col.appendChild(title);
+
+        questions.forEach((item, index) => {
+          const card = document.createElement('div');
+          card.className = 'card yellow lighten-3';
+          const content = document.createElement('div');
+          content.className = 'card-content';
+          content.innerText = (index + 1) * 100;
+
+          content.addEventListener('click', () => {
+            openQuestionModal(category, item.answer, item.question, card);
+            usedQuestions++;
+            if (usedQuestions === totalQuestions) {
+              document.getElementById('final-jeopardy-btn').style.display = 'block';
+            }
+          });
+
+          card.appendChild(content);
+          col.appendChild(card);
+          totalQuestions++;
+        });
+
+        board.appendChild(col);
+      });
+    }
+
+    function openQuestionModal(category, answer, correctQuestion, cardElement) {
+      document.getElementById('modal-category').textContent = category;
+      document.getElementById('modal-answer').textContent = answer;
+      document.getElementById('modal-question').textContent = correctQuestion;
+      document.getElementById('correct-question').classList.add('hide');
+
+      const instance = M.Modal.getInstance(document.getElementById('question-modal'));
+      instance.open();
+
+      const showBtn = document.getElementById('show-answer-btn');
+      showBtn.onclick = () => {
+        document.getElementById('correct-question').classList.remove('hide');
+        cardElement.classList.add('used');
+        cardElement.innerHTML = `<div class="card-content grey-text">Used</div>`;
+      };
+    }
+
+    // Final Jeopardy button click action
+    document.getElementById('final-jeopardy-btn').addEventListener('click', () => {
+      M.Modal.getInstance(document.getElementById('final-jeopardy-modal')).open();
+    });
+
+    // Invisible button to trigger Final Jeopardy
+    function markAllQuestionsAsUsed() {
+      const cards = document.querySelectorAll('.card');
+      cards.forEach(card => {
+        card.classList.add('used');
+      });
+      usedQuestions = totalQuestions;
+      document.getElementById('final-jeopardy-btn').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
