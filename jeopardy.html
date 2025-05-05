@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Chen's Baby Shower Jeopardy</title>
+  <title>Baby Shower Jeopardy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
@@ -19,6 +19,12 @@
       cursor: pointer;
       font-size: 1.5em;
       padding: 10px;
+    }
+
+    .board-wrapper {
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
     }
 
     #board {
@@ -77,17 +83,34 @@
       color: black;
     }
 
+    .card.yellow:hover {
+      background-color: #ffdb4d;
+      transform: scale(1.05);
+      transition: transform 0.2s ease;
+    }
+
     #final-jeopardy-btn {
       margin-top: 40px;
       display: none;
       width: 100%;
       font-size: 2.0em;
+      font-weight: bold;  /* <-- added bold here */
       background-color: #0069b4;
       color: white;
     }
 
     #final-jeopardy-btn:hover {
       background-color: #004a99;
+    }
+
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+
+    #final-jeopardy-btn.blink {
+      animation: blink 1s infinite;
     }
 
     #final-jeopardy-modal .modal-content h4 {
@@ -101,7 +124,7 @@
       font-size: 2em;
       text-align: center;
       font-weight: bold;
-      color: black; /* Text color for Final Jeopardy */
+      color: black;
     }
 
     .center-btn {
@@ -124,14 +147,9 @@
     }
 
     #welcome-modal .modal-content p {
-      font-size: 2em;
-      color: black; /* Ensure text is black in welcome pop-up */
-    }
-
-    #welcome-modal .modal-content h4 {
-      color: black; /* Ensure "Welcome" text is black */
-      font-size: 2.5em;
+      font-size: 2.2em;
       font-weight: bold;
+      color: black;
     }
 
     #correct-question {
@@ -140,19 +158,19 @@
     }
 
     #trigger-final-jeopardy {
-      display: none;
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-size: 2em;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
     }
 
+    #question-modal .modal-content p,
     #question-modal .modal-content {
-      color: black; /* Set text color to black for better readability */
-    }
-
-    #question-modal .modal-content p {
-      color: black; /* Set text color to black for better visibility inside question pop-up */
-    }
-
-    #final-jeopardy-modal .modal-content p {
-      color: black; /* Set text color to black for Final Jeopardy question */
+      color: black;
     }
   </style>
 </head>
@@ -160,9 +178,21 @@
 
   <div id="welcome-modal" class="modal">
     <div class="modal-content">
-      <h4>Welcome to Chen's Baby Shower Jeopardy!</h4> <!-- Centered and black color -->
-      <p>Respond with an answer as a question, like: <strong>What is ...?</strong></p>
-      <p>Have fun!</p>
+      <p style="text-align: left; font-size: 1.2em;">
+	 <strong>How to Play:</strong><br>
+        ✅ Our baby shower Jeopardy is full of fun categories and points.<br>
+        ✅ Teams will take turns picking a category and number (like “Moon for 200”).<br>
+        ✅ Our host(s) will read the question, and your team will have 10 seconds to answer.<br>
+        ✅ If your team answered correctly, your team will earn points. If incorrect, other teams can try to steal.<br>
+	✅ Need to answer in the form of a question!<br><br>
+        <strong>Example:</strong><br>
+        Category: Baby Animals for 300<br>
+        Question: “What’s a baby cat called?”<br>
+        Team says: “What is a Kitten” → 300 points!<br><br>
+        <strong>Lifeline:</strong><br>
+        Each team gets one lifeline called <em>Help From The Audience</em>. You can ask the audience to shout out ideas! Your team can only use this once, so save it for a tricky question!<br><br>
+        Let’s have some fun and see who knows the most facts! 👶🎉
+      </p>
     </div>
     <div class="modal-footer start-game-btn">
       <a href="#!" class="modal-close waves-effect waves-green btn">Start Game</a>
@@ -170,9 +200,11 @@
   </div>
 
   <div class="container" id="game-board">
-    <h4>Chen's Baby Shower Jeopardy Board</h4>
-    <div class="row" id="board"></div>
-    <button id="final-jeopardy-btn" class="btn-large waves-effect waves-light">Final Jeopardy</button>
+    <h4 class="center-align">BABY SHOWER JEOPARDY</h4>
+    <div class="board-wrapper">
+      <div class="row" id="board"></div>
+    </div>
+    <button id="final-jeopardy-btn" class="btn-large waves-effect waves-light">FINAL JEOPARDY</button>
   </div>
 
   <div id="question-modal" class="modal">
@@ -200,7 +232,7 @@
     </div>
   </div>
 
-  <button id="trigger-final-jeopardy" onclick="markAllQuestionsAsUsed()">Invisible Trigger</button>
+  <button id="trigger-final-jeopardy" onclick="markAllQuestionsAsUsed()">🌙</button>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script>
@@ -218,7 +250,7 @@
         { answer: "Kon'nichiwa!", question: "Japanese" },
         { answer: "Sabaidee!", question: "Laotian" }
       ],
-      "Moon": [
+      "Planets": [
         { answer: "The red planet.", question: "What is Mars?" },
         { answer: "This planet has the most moons.", question: "What is Saturn?" },
         { answer: "This object is at the center of our solar system.", question: "What is the Sun?" },
@@ -282,7 +314,9 @@
             openQuestionModal(category, item.answer, item.question, card);
             usedQuestions++;
             if (usedQuestions === totalQuestions) {
-              document.getElementById('final-jeopardy-btn').style.display = 'block';
+              const finalBtn = document.getElementById('final-jeopardy-btn');
+              finalBtn.style.display = 'block';
+              finalBtn.classList.add('blink');
             }
           });
 
@@ -312,19 +346,21 @@
       };
     }
 
-    // Final Jeopardy button click action
     document.getElementById('final-jeopardy-btn').addEventListener('click', () => {
+      const finalBtn = document.getElementById('final-jeopardy-btn');
+      finalBtn.classList.remove('blink');
       M.Modal.getInstance(document.getElementById('final-jeopardy-modal')).open();
     });
 
-    // Invisible button to trigger Final Jeopardy
     function markAllQuestionsAsUsed() {
       const cards = document.querySelectorAll('.card');
       cards.forEach(card => {
         card.classList.add('used');
       });
       usedQuestions = totalQuestions;
-      document.getElementById('final-jeopardy-btn').style.display = 'block';
+      const finalBtn = document.getElementById('final-jeopardy-btn');
+      finalBtn.style.display = 'block';
+      finalBtn.classList.add('blink');
     }
   </script>
 </body>
